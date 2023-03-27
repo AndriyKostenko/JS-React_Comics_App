@@ -33,6 +33,9 @@ class RandomChar extends Component{
 
     render() {
         const {char: {name, description, thumbnail, homepage, wiki}} = this.state;
+        // if (!description) {
+        //     description = 'There is no data for this charachter.' 
+        // }
 
         return (
             <div className="randomchar">
