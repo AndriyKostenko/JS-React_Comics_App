@@ -1,5 +1,6 @@
 // getting info from API
 class MarvelService {
+    //here will be your api key from marvel website
     _apiBase = 'https://gateway.marvel.com:443/v1/public/';
     _apiKey = 'apikey=949a4bdb9d664fb2b0668fcf3534336a';
 
