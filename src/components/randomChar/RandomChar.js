@@ -19,7 +19,7 @@ class RandomChar extends Component{
 
     marvelService = new MarvelService();
 
-    
+    //after constructor (here doesnt exist) creating necces. functionality
     componentDidMount() {
         this.updateChar();
     }
@@ -80,9 +80,11 @@ class RandomChar extends Component{
     }
 
 }
-    
+
+// charachter view
 const View = ({char}) => {
     const {name, description, thumbnail, homepage, wiki} = char;
+    //checking for missed character's photo and fixing error photo from server
     let imgStyle = {'objectFit' : 'cover'};
     if (thumbnail === 'http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg') {
         imgStyle = {'objectFit': 'contain'}
