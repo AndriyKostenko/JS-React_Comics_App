@@ -41,9 +41,16 @@ class RandomChar extends Component{
             loading: false}) // when all data succss. loaded - loading will set to false
     }
 
+    onCharLoading = (char) => {
+        this.setState({
+            loading: true
+        })
+    }
+
     //updating state with received info from API
     updateChar = () => {
         const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000); // range of characters id from website
+        this.onCharLoading();
         this.marvelService
             .getCharacter(id)
             .then(this.onCharLoaded) // argument 'char' will be iserted automatically 
