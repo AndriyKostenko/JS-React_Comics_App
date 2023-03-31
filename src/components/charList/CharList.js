@@ -11,16 +11,31 @@ class CharList extends Component {
     state = {
         chars: [],
         loading: true,
-        error: false
+        error: false,
+        newItemLoading: false,
+        offset: 210,
+        charEnded: false
     }
 
     marvelService = new MarvelService();
 
 
     componentDidMount(){
-        this.marvelService.get9Characters() // after getting infro for 9 chars all info will be sent to func onCharsLoaded()
+        this.onRequest();
+    }
+
+
+    onRequest = (offset) => {
+        this.onCharListLoading();
+        this.marvelService.get9Characters(offset)
             .then(this.onCharsLoaded)
             .catch(this.onError)
+    }
+
+    onCharListLoading = () => {
+        this.setState({
+            newItemLoading: true
+        })
     }
 
 
@@ -33,10 +48,19 @@ class CharList extends Component {
         })
     }
 
-    onCharsLoaded = (chars) => {
-        this.setState({
-            chars, 
-            loading: false}) // when all data succss. loaded - loading will set to false
+    onCharsLoaded = (newChars) => {
+        let ended = false;
+        if (newChars.length < 9) {
+            ended = true
+        } // checking if new chars added to the list
+
+        this.setState(({chars, offset}) => ({
+            chars: [...chars, ...newChars], 
+            loading: false,
+            newItemLoading: false,
+            offset: offset + 9,
+            charEnded: ended
+        })) // when all data succss. loaded - loading will set to false
     }
 
     // mapping info for rendering all chars info
@@ -67,7 +91,7 @@ class CharList extends Component {
     }
 
     render () {
-        const {chars, loading, error} = this.state;
+        const {chars, loading, error, newItemLoading, offset, charEnded} = this.state;
 
         const items = this.renderItems(chars);
 
@@ -76,12 +100,16 @@ class CharList extends Component {
         const content = !(loading || error) ? items : null;
 
         // created case if loading still in progress or not - to show necc. info only
+        // on button used arrow func. to pass into current offset 
         return (
             <div className="char__list">
                 {error_message}
                 {spinner}
                 {content}
-                <button className='button button__main button__long'>
+                <button className='button button__main button__long'
+                        disabled={newItemLoading}
+                        style={{'display': charEnded ? 'none' : 'block'}}
+                        onClick={() => this.onRequest(offset)}>
                     <div className='inner'>Load more</div>
                 </button>
             </div>

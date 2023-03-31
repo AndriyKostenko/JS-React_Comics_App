@@ -30,6 +30,8 @@ class CharInfo extends Component {
         }
     }
 
+
+
     updateChar = () => {
         const {charId} = this.props;
         if (!charId) {
