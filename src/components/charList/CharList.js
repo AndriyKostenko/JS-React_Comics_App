@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import Spinner from '../spinner/spinner';
@@ -19,7 +19,9 @@ class CharList extends Component {
         charEnded: false
     }
 
+
     marvelService = new MarvelService();
+
 
 
     componentDidMount(){
@@ -65,9 +67,24 @@ class CharList extends Component {
         })) // when all data succss. loaded - loading will set to false
     }
 
+    //creating the array of selected char. from the list on page
+    charsRef = [];
+
+    //pushing all loaded chars to an array  
+    setRef = (ref) => {
+        this.charsRef.push(ref);
+    }
+
+    focusOnChar = (i) => {
+        this.charsRef.forEach(item => item.classList.remove('char__item_selected')); // first passing through all items and removing style in case
+        this.charsRef[i].classList.add('char__item_selected'); // adding style for focused char
+        this.charsRef[i].focus(); //setting focus on current char
+    }
+
+
     // mapping info for rendering all chars info
     renderItems(arr) {
-        const items =  arr.map((item) => {
+        const items =  arr.map((item, i) => {
             let imgStyle = {'objectFit' : 'cover'};
             if (item.thumbnail === 'http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg') {
                 imgStyle = {'objectFit' : 'unset'};
@@ -76,8 +93,12 @@ class CharList extends Component {
             return (
                 <li
                     className="char__item"
+                    ref={this.setRef}
                     key={item.id}
-                    onClick={() => this.props.onCharSelected(item.id)}>
+                    onClick={() => {
+                        this.props.onCharSelected(item.id);
+                        this.focusOnChar(i);
+                    }}>
                         <img src={item.thumbnail} alt={item.name} style={imgStyle}/>
                         <div className="char__name">{item.name}</div>
                 </li>
