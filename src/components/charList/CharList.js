@@ -5,48 +5,34 @@ import Spinner from '../spinner/spinner';
 import ErrorMessage from '../errorMessage/errorMessage';
 
 import './charList.scss';
-import MarvelService from '../../services/MarvelService';
+import useMarvelService from '../../services/MarvelService';
 
 
 const CharList = (props) => {
 
     //setting new states
     const [chars, setChars] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(false);
     const [newItemLoading, setNewItemLoading] = useState(false);
     const [offset, setOffset] = useState(210);
     const [charEnded, setCharEnded] = useState(false);
 
 
-    const marvelService = new MarvelService();
+    const {loading, error, get9Characters} = useMarvelService();
 
     // will be initialized only one time and called when component has been fully created on the page
     useEffect(() => {
-        onRequest();
+        onRequest(offset, true);
     }, [])
 
 
-
-    const onRequest = (offset) => {
-        onCharListLoading();
-        marvelService.get9Characters(offset)
-            .then(onCharsLoaded)
-            .catch(onError)
-    }
-
-    const onCharListLoading = () => {
-        setNewItemLoading(true);
-    }
-
-
-
-    //cathing error and notifiying user
-    const onError = () => {
-        setError(true);
-        setLoading(loading => false);
+    //if initial loading of 9 chars - set to false, if need load more chars on page - true
+    const onRequest = (offset, initial) => {
+        initial ? setNewItemLoading(false) : setNewItemLoading(true);
         
+        get9Characters(offset)
+            .then(onCharsLoaded)
     }
+
 
     const onCharsLoaded = (newChars) => {
         let ended = false;
@@ -57,7 +43,6 @@ const CharList = (props) => {
 
         // used callback to follow previous state
         setChars(chars => [...chars, ...newChars]);
-        setLoading(loading => false); // when all data succss. loaded - loading will set to false
         setNewItemLoading(newItemLoading => false);
         setOffset(offset => offset + 9);
         setCharEnded(charEnded => ended);
@@ -119,8 +104,8 @@ const CharList = (props) => {
     const items = renderItems(chars);
 
     const error_message = error ? <ErrorMessage/> :null;
-    const spinner = loading ? <Spinner/> : null;
-    const content = !(loading || error) ? items : null;
+    const spinner = loading && !newItemLoading ? <Spinner/> : null;
+
 
     // created case if loading still in progress or not - to show necc. info only
     // on button used arrow func. to pass into current offset 
@@ -128,7 +113,7 @@ const CharList = (props) => {
         <div className="char__list">
             {error_message}
             {spinner}
-            {content}
+            {items}
             <button className='button button__main button__long'
                     disabled={newItemLoading}
                     style={{'display': charEnded ? 'none' : 'block'}}

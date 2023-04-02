@@ -1,32 +1,30 @@
+import { useHttp } from "../hooks/http.hook";
+
+
+
+
 // getting info from API
-class MarvelService {
+const useMarvelService = () => {
+    // getting info about connection to API
+    const {loading, request, error, clearError} = useHttp();
+
     //here will be your api key from marvel website
-    _apiBase = 'https://gateway.marvel.com:443/v1/public/';
-    _apiKey = 'apikey=949a4bdb9d664fb2b0668fcf3534336a';
-    _baseOffset = 210;
+    const _apiBase = 'https://gateway.marvel.com:443/v1/public/';
+    const _apiKey = 'apikey=949a4bdb9d664fb2b0668fcf3534336a';
+    const _baseOffset = 210;
 
 
-    getResource = async (url) => {
-        let res = await fetch(url);
-
-        if (!res.ok) {
-            throw new Error(`Can't fetch ${url}, status: ${res.status}`);
-        }
-
-        return await res.json();
+    const get9Characters = async (offset = _baseOffset) => {
+        const res = await request(`${_apiBase}characters?limit=9&offset=${offset}&${_apiKey}`);
+        return res.data.results.map(_transformCharacter); // appliying for each received data from response Object
     }
 
-    get9Characters = async (offset = this._baseOffset) => {
-        const res = await  this.getResource(`${this._apiBase}characters?limit=9&offset=${offset}&${this._apiKey}`);
-        return res.data.results.map(this._transformCharacter); // appliying for each received data from response Object
+    const getCharacter = async (id) => {
+        const res = await request(`${_apiBase}characters/${id}?limit=9&offset=210&${_apiKey}`)
+        return _transformCharacter(res.data.results[0]); // get a character object
     }
 
-    getCharacter = async (id) => {
-        const res = await this.getResource(`${this._apiBase}characters/${id}?limit=9&offset=210&${this._apiKey}`)
-        return this._transformCharacter(res.data.results[0]); // get a character object
-    }
-
-    _transformCharacter = (char) => {
+    const _transformCharacter = (char) => {
         return {
             id:char.id,
             name: char.name,
@@ -38,7 +36,9 @@ class MarvelService {
         }
     }
 
+    return {loading, error, get9Characters, getCharacter, clearError};
+
 
 }
 
-export default MarvelService;
+export default useMarvelService;

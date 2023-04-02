@@ -6,16 +6,15 @@ import ErrorMessage from '../errorMessage/errorMessage';
 import Skeleton from '../skeleton/Skeleton';
 
 import './charInfo.scss';
-import MarvelService from '../../services/MarvelService';
+import useMarvelService from '../../services/MarvelService';
 
 
 const CharInfo = (props) => {
     // created state (char - all null), by default loading - true before getting info
     const [char, setChar] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(false);
+
     
-    const marvelService = new MarvelService();
+    const {loading, error, getCharacter, clearError} = useMarvelService();
 
     // called when component has been fully created and following for changes in charId
     // comparing prev charId and new charId
@@ -31,29 +30,19 @@ const CharInfo = (props) => {
         if (!charId) {
             return;
         }
+        clearError();
 
-        onCharLoading();
-
-        marvelService
-            .getCharacter(charId) // when we receive a char info it will be sent to method onCharLoaded as an arg. 'char'
+        getCharacter(charId) // when we receive a char info it will be sent to method onCharLoaded as an arg. 'char'
             .then(onCharLoaded) // otherwise - cath the error
-            .catch(onError)
-    }
 
-    const onError = () => {
-        setError(true);
-        setLoading(false);
     }
 
     // taking arg 'char' from method updateChar if successed 
     const onCharLoaded = (char) => {
         setChar(char);
-        setLoading(false); // when all data succss. loaded - loading will set to false
     }
 
-    const onCharLoading = () => {
-        setLoading(true);
-    }
+
 
 
     const skeleton = char || loading || error ? null : <Skeleton/>
