@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
 import Spinner from '../spinner/spinner';
@@ -9,83 +9,69 @@ import './charInfo.scss';
 import MarvelService from '../../services/MarvelService';
 
 
-class CharInfo extends Component {
+const CharInfo = (props) => {
     // created state (char - all null), by default loading - true before getting info
-    state = {
-        char: null,
-        loading: false,
-        error: false,
-    }
+    const [char, setChar] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(false);
+    
+    const marvelService = new MarvelService();
 
-    marvelService = new MarvelService();
+    // called when component has been fully created and following for changes in charId
+    // comparing prev charId and new charId
 
-    //called when component has been fully created on the page
-    componentDidMount() {
-        this.updateChar();
-    }
+    useEffect(() => {
+        updateChar();
+        // eslint-disable-next-line
+    }, [props.charId]) 
+        
 
-    //compare prev and new props, and if changes have done - load new info
-    componentDidUpdate(prevProps, prevState) {
-        if (this.props.charId !== prevProps.charId) {
-            this.updateChar();
-        }
-    }
-
-
-
-    updateChar = () => {
-        const {charId} = this.props;
+    const updateChar = () => {
+        const {charId} = props;
         if (!charId) {
             return;
         }
 
-        this.onCharLoading();
+        onCharLoading();
 
-        this.marvelService
+        marvelService
             .getCharacter(charId) // when we receive a char info it will be sent to method onCharLoaded as an arg. 'char'
-            .then(this.onCharLoaded) // otherwise - cath the error
-            .catch(this.onError)
+            .then(onCharLoaded) // otherwise - cath the error
+            .catch(onError)
     }
 
-    onError = () => {
-        this.setState({
-            loading: false,
-            error: true
-        })
+    const onError = () => {
+        setError(true);
+        setLoading(false);
     }
 
     // taking arg 'char' from method updateChar if successed 
-    onCharLoaded = (char) => {
-        this.setState({
-            char, 
-            loading: false}) // when all data succss. loaded - loading will set to false
+    const onCharLoaded = (char) => {
+        setChar(char);
+        setLoading(false); // when all data succss. loaded - loading will set to false
     }
 
-    onCharLoading = (char) => {
-        this.setState({
-            loading: true
-        })
+    const onCharLoading = () => {
+        setLoading(true);
     }
 
-    render () {
-        const {char, loading, error } = this.state;
 
-        const skeleton = char || loading || error ? null : <Skeleton/>
-        const error_message = error ? <ErrorMessage/> :null;
-        const spinner = loading ? <Spinner/> : null;
-        const content = !(loading || error || !char) ? <View char={char}/> : null;
-        
-        return (
-            <div className="char__info">
-                {skeleton}
-                {error_message}
-                {spinner}
-                {content}
-            </div>
-        )
-    }
+    const skeleton = char || loading || error ? null : <Skeleton/>
+    const error_message = error ? <ErrorMessage/> :null;
+    const spinner = loading ? <Spinner/> : null;
+    const content = !(loading || error || !char) ? <View char={char}/> : null;
     
+    return (
+        <div className="char__info">
+            {skeleton}
+            {error_message}
+            {spinner}
+            {content}
+        </div>
+    )
 }
+    
+
 
 const View = ({char}) => {
     const {name, description, thumbnail, homepage, wiki, comics} = char;
@@ -121,7 +107,9 @@ const View = ({char}) => {
 
                     { 
                         comics.map((item, i) => {
+
                             if (i >= 10){     //showing only 10 comics with char
+                                // eslint-disable-next-line
                                 return;
                             }
                             return ( 

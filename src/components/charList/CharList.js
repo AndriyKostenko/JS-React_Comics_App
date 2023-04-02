@@ -21,7 +21,7 @@ const CharList = (props) => {
 
     const marvelService = new MarvelService();
 
-    // will be initialized only one time
+    // will be initialized only one time and called when component has been fully created on the page
     useEffect(() => {
         onRequest();
     }, [])
@@ -93,7 +93,14 @@ const CharList = (props) => {
                     onClick={() => {
                         props.onCharSelected(item.id);
                         focusOnChar(i);
-                    }}>
+                    }}
+                    onKeyDown={(event) => {
+                        if (event.key === ' ' || event.key === "Enter") {
+                            props.onCharSelected(item.id);
+                            focusOnChar(i)
+                        }
+                    }}
+                    >
                         <img src={item.thumbnail} alt={item.name} style={imgStyle}/>
                         <div className="char__name">{item.name}</div>
                 </li>
