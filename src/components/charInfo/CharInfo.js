@@ -5,9 +5,9 @@ import Spinner from '../spinner/spinner';
 import ErrorMessage from '../errorMessage/errorMessage';
 import Skeleton from '../skeleton/Skeleton';
 
-import './charInfo.scss';
 import useMarvelService from '../../services/MarvelService';
 
+import './charInfo.scss';
 
 const CharInfo = (props) => {
     // created state (char - all null), by default loading - true before getting info
