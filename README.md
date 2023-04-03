@@ -15,8 +15,12 @@
   1. `git clone https://github.com/AndriyKostenko/JS-React_Comics_App.git `
 
   2. `cd` into the project folder and `npm install`
+
+  3.  get API key from https://developer.marvel.com
+
+  4.  insert key into MarvelService.js 
  
-  3. `npm start` to start the proj.
+  5. `npm start` to start the proj.
 
 
 Runs the app in the development mode.\
