@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Spinner from '../spinner/spinner';
 import ErrorMessage from '../errorMessage/errorMessage';
 import useMarvelService from '../../services/MarvelService';
+import AppBanner from '../appBanner/AppBanner';
 
 import './singleCharacterPage.scss';
 
@@ -38,6 +39,7 @@ const SingleCharacterPage = () => {
 
     return (
         <>
+            <AppBanner/>
             {error_message}
             {spinner}
             {content}

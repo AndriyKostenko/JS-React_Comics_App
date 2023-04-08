@@ -10,7 +10,7 @@ const useMarvelService = () => {
 
     //here will be your api key from marvel website
     const _apiBase = 'https://gateway.marvel.com:443/v1/public/';
-    const _apiKey = '.....';
+    const _apiKey = 'apikey=949a4bdb9d664fb2b0668fcf3534336a';
     const _baseOffset = 210;
 
 
