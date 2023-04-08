@@ -3,6 +3,7 @@
   - generating of random comic;
   - generating list of comics;
   - inspecting specific comic;
+  - finding specific character;
 
 # On your PC, you have to intall the follow. packages b4 running:
 
