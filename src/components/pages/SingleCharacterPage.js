@@ -1,5 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { Helmet } from 'react-helmet';
 
 import Spinner from '../spinner/spinner';
 import ErrorMessage from '../errorMessage/errorMessage';
@@ -52,7 +53,15 @@ const View = ({char}) => {
     const {name, description, thumbnail} = char;
 
     return (
+        
         <div className="single-char">
+            <Helmet>
+                <meta
+                    name="description"
+                    content={`${name} - info.`}
+                />
+                <title>{name} - char info</title>
+            </Helmet>
             <img src={thumbnail} alt={name} className="single-char__char-img"/>
             <div className="single-char__info">
                 <h2 className="single-char__name">{name}</h2>

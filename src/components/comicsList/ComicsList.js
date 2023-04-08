@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 
 import useMarvelService from '../../services/MarvelService';
 import Spinner from '../spinner/spinner';
@@ -69,6 +70,13 @@ const ComicsList = () => {
 
     return (
         <div className="comics__list">
+            <Helmet>
+                <meta
+                    name="description"
+                    content='marvel comics list'
+                />
+                <title>Marvel comics list.</title>
+            </Helmet>
             {errorMessage}
             {spinner}
             {items}
