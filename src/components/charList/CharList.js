@@ -1,4 +1,4 @@
-import {useState, useEffect, useRef} from 'react';
+import {useState, useEffect, useRef, useMemo} from 'react';
 import PropTypes from 'prop-types';
 import {CSSTransition, TransitionGroup} from 'react-transition-group';
 
@@ -84,7 +84,6 @@ const CharList = (props) => {
     // mapping info for rendering all chars info
     // added animation for li of chars with react-transition-group
     function renderItems(arr) {
-        console.log('render')
         const items =  arr.map((item, i) => {
             let imgStyle = {'objectFit' : 'cover'};
             if (item.thumbnail === 'http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg') {
@@ -129,12 +128,18 @@ const CharList = (props) => {
         )
     }
 
+    // created var. elements with hook 'useMemo()' to save current state and to render only in case of process changes (states)
+    const elements = useMemo(()=> {
+        return setContent(process, () => renderItems(chars), newItemLoading);
+        // eslint-disable-next-line
+    }, [process])
+
 
     // created case if loading still in progress or not - to show necc. info only.
     // on button used arrow func. to pass into current offset 
     return (
         <div className="char__list">
-            {setContent(process, () => renderItems(chars), newItemLoading)}
+            {elements}
             <button className='button button__main button__long'
                     disabled={newItemLoading}
                     style={{'display': charEnded ? 'none' : 'block'}}
