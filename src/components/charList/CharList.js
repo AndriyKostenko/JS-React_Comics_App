@@ -4,10 +4,27 @@ import {CSSTransition, TransitionGroup} from 'react-transition-group';
 
 import Spinner from '../spinner/spinner';
 import ErrorMessage from '../errorMessage/errorMessage';
-
-import './charList.scss';
 import useMarvelService from '../../services/MarvelService';
 
+
+import './charList.scss';
+
+
+//generating a content according to the current process state (http.js)
+const setContent = (process, Component, newItemLoading) => {
+    switch (process) {
+        case 'waiting':
+            return <Spinner/>;
+        case 'loading':
+            return newItemLoading ? <Component/> : <Spinner/>; // if loading new elems - render component, if no- first render with spinner
+        case 'confirmed':
+            return <Component/>;
+        case 'error':
+            return <ErrorMessage/>;
+        default:
+            throw new Error('Unexpected process state');
+    }
+}
 
 const CharList = (props) => {
 
@@ -18,11 +35,12 @@ const CharList = (props) => {
     const [charEnded, setCharEnded] = useState(false);
 
 
-    const {loading, error, get9Characters} = useMarvelService();
+    const {get9Characters, process, setProcess} = useMarvelService();
 
     // will be initialized only one time and called when component has been fully created on the page
     useEffect(() => {
         onRequest(offset, true);
+        // eslint-disable-next-line
     }, [])
 
 
@@ -32,6 +50,7 @@ const CharList = (props) => {
         
         get9Characters(offset)
             .then(onCharsLoaded)
+            .then(()=> setProcess('confirmed'))
     }
 
 
@@ -65,6 +84,7 @@ const CharList = (props) => {
     // mapping info for rendering all chars info
     // added animation for li of chars with react-transition-group
     function renderItems(arr) {
+        console.log('render')
         const items =  arr.map((item, i) => {
             let imgStyle = {'objectFit' : 'cover'};
             if (item.thumbnail === 'http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg') {
@@ -72,10 +92,12 @@ const CharList = (props) => {
             }
 
             // 'el' - reference on DOM element
+            //applied transition anim. to list of chars with transition-group lib.
             return (
                 <CSSTransition key={item.id} timeout={500} classNames="char__item">
                     <li
                         className="char__item"
+                        tabIndex={0}
                         ref={el => charsRef.current[i] = el}
                         key={item.id}
                         onClick={() => {
@@ -107,20 +129,12 @@ const CharList = (props) => {
         )
     }
 
-    
-    const items = renderItems(chars);
 
-    const error_message = error ? <ErrorMessage/> :null;
-    const spinner = loading && !newItemLoading ? <Spinner/> : null;
-
-
-    // created case if loading still in progress or not - to show necc. info only
+    // created case if loading still in progress or not - to show necc. info only.
     // on button used arrow func. to pass into current offset 
     return (
         <div className="char__list">
-            {error_message}
-            {spinner}
-            {items}
+            {setContent(process, () => renderItems(chars), newItemLoading)}
             <button className='button button__main button__long'
                     disabled={newItemLoading}
                     style={{'display': charEnded ? 'none' : 'block'}}

@@ -10,6 +10,23 @@ import ErrorMessage from '../errorMessage/errorMessage';
 import './comicsList.scss';
 
 
+//generating a content according to the current process state (http.js)
+const setContent = (process, Component, newItemLoading) => {
+    switch (process) {
+        case 'waiting':
+            return <Spinner/>;
+        case 'loading':
+            return newItemLoading ? <Component/> : <Spinner/>; // if loading new elems - render component, if no- first render with spinner
+        case 'confirmed':
+            return <Component/>;
+        case 'error':
+            return <ErrorMessage/>;
+        default:
+            throw new Error('Unexpected process state');
+    }
+}
+
+
 
 const ComicsList = () => {
     //creatiing states
@@ -19,7 +36,7 @@ const ComicsList = () => {
     const [comicsEnded, setComicsEnded] = useState(false);
 
     //getting states info after request to API
-    const {loading, error, get8Comics} = useMarvelService();
+    const {get8Comics, process, setProcess} = useMarvelService();
 
     //will be 1 time initialized after rendering the page 
     useEffect(() => {
@@ -31,6 +48,7 @@ const ComicsList = () => {
         initial ? setNewItemLoading(false) : setNewItemLoading(true);
         get8Comics(offset)
             .then(onComicsListLoaded)
+            .then(() => setProcess('confirmed'));
     }
 
     const onComicsListLoaded = (newComicsList) => {
@@ -64,9 +82,6 @@ const ComicsList = () => {
         )
     }
 
-    const items = renderItems(comicsList);
-    const errorMessage = error ? <ErrorMessage/> : null;
-    const spinner = loading && !newItemLoading ? <Spinner/> : null;
 
     return (
         <div className="comics__list">
@@ -77,9 +92,7 @@ const ComicsList = () => {
                 />
                 <title>Marvel comics list.</title>
             </Helmet>
-            {errorMessage}
-            {spinner}
-            {items}
+            {setContent(process, () => renderItems(comicsList), newItemLoading)}
             <button 
                 disabled={newItemLoading} 
                 style={{'display' : comicsEnded ? 'none' : 'block'}}

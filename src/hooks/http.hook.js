@@ -2,36 +2,29 @@ import {useState, useCallback} from "react";
 
 //creted hook for GETing data from API and returning sates: loading, error and data if ok
 export const useHttp = () => {
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
+    const [process, setProcess] = useState('waiting'); // creating state for current process: loading, confirmed, error
 
     const request = useCallback(async (url, method ='GET', body= null, headers = {'Content-Type': 'application/json'}) => {
 
-        setLoading(true);
-
+        setProcess('loading')
         try {
             const response = await fetch(url, {method, body, headers});
             
             if (!response.ok) {
                 throw new Error(`Could not fect ${url}, status: ${response.status}`)
             }
-
             const data = await response.json();
-
-            setLoading(false);
-
             return data;
-
-
         } catch(error) {
-            setLoading(false);
-            setError(error.message);
+            setProcess('error')
             throw error;
         }
 
     }, []);
 
-    const clearError = useCallback(() => setError(null), []);
+    const clearError = useCallback(() => {
+        setProcess('loading')
+    }, []);
 
-    return {loading, request, error, clearError}
+    return {request, clearError, process, setProcess}
 }

@@ -2,10 +2,9 @@ import { useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 
-import Spinner from '../spinner/spinner';
-import ErrorMessage from '../errorMessage/errorMessage';
 import useMarvelService from '../../services/MarvelService';
 import AppBanner from '../appBanner/AppBanner';
+import setContent from '../../utils/setContent';
 
 import './singleCharacterPage.scss';
 
@@ -13,7 +12,7 @@ import './singleCharacterPage.scss';
 const SingleCharacterPage = () => {
     const {charId} = useParams(); // received from value ':charId' after adding to SingleCharPage in App.js
     const [char, setChar] = useState(null);
-    const {loading, error, getCharacter, clearError} = useMarvelService();
+    const {getCharacter, clearError, process, setProcess} = useMarvelService();
 
     useEffect(() => {
         updateChar();
@@ -26,7 +25,7 @@ const SingleCharacterPage = () => {
 
         getCharacter(charId) // when we receive a char info it will be sent to method onCharLoaded as an arg. 'char'
             .then(onCharLoaded) // otherwise - cath the error
-
+            .then(() => setProcess('confirmed'));
     }
 
     // taking arg 'char' from method updateChar if successed 
@@ -34,23 +33,19 @@ const SingleCharacterPage = () => {
         setChar(char);
     }
 
-    const error_message = error ? <ErrorMessage/> : null;
-    const spinner = loading ? <Spinner/> : null;
-    const content = !(loading || error || !char) ? <View char={char}/> :null;
 
     return (
         <>
             <AppBanner/>
-            {error_message}
-            {spinner}
-            {content}
+            {setContent(process, View, char)}
         </>
     )
 
 }
 
-const View = ({char}) => {
-    const {name, description, thumbnail} = char;
+
+const View = ({data}) => {
+    const {name, description, thumbnail} = data;
 
     return (
         

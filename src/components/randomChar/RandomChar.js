@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
-import Spinner from '../spinner/spinner';
-import ErrorMessage from '../errorMessage/errorMessage';
-
-import './randomChar.scss';
 
 import mjolnir from '../../resources/img/mjolnir.png';
 import useMarvelService from '../../services/MarvelService';
+import setContent from '../../utils/setContent';
+
+import './randomChar.scss';
 
 
 const RandomChar = () => {
@@ -13,7 +12,7 @@ const RandomChar = () => {
     const [char, setChar] = useState({});
     
     
-    const {loading, error, getCharacter, clearError} = useMarvelService();
+    const {getCharacter, clearError, process, setProcess} = useMarvelService();
 
     //will be called after rendering of component
     useEffect(() => {
@@ -23,6 +22,7 @@ const RandomChar = () => {
         return () => {
             clearInterval(timerId);
         }
+        // eslint-disable-next-line
     }, []) 
 
 
@@ -38,21 +38,15 @@ const RandomChar = () => {
 
         getCharacter(id)
             .then(onCharLoaded) // argument 'char' will be iserted automatically 
+            .then(() => setProcess('confirmed'));
         }
 
 
 
-
-    const error_message = error ? <ErrorMessage/> :null;
-    const spinner = loading ? <Spinner/> : null;
-    const content = !(loading || error) ? <View char={char}/> : null;
-
     // created case if loading still in progress or not to show necc. info only
     return (
         <div className="randomchar">
-            {error_message}
-            {spinner}
-            {content}
+            {setContent(process, View, char)}
             <div className="randomchar__static">
                 <p className="randomchar__title">
                     Random character for today!<br/>
@@ -73,8 +67,8 @@ const RandomChar = () => {
 
 
 // charachter view
-const View = ({char}) => {
-    const {name, description, thumbnail, homepage, wiki} = char;
+const View = ({data}) => {
+    const {name, description, thumbnail, homepage, wiki} = data;
     //checking for missed character's photo and fixing error photo from server
     let imgStyle = {'objectFit' : 'cover'};
     if (thumbnail === 'http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg') {

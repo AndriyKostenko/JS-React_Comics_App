@@ -1,20 +1,18 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
-import Spinner from '../spinner/spinner';
-import ErrorMessage from '../errorMessage/errorMessage';
-import Skeleton from '../skeleton/Skeleton';
-
 import useMarvelService from '../../services/MarvelService';
+import setContent from '../../utils/setContent';
 
 import './charInfo.scss';
+
 
 const CharInfo = (props) => {
     // created state (char - all null), by default loading - true before getting info
     const [char, setChar] = useState(null);
 
     
-    const {loading, error, getCharacter, clearError} = useMarvelService();
+    const {getCharacter, clearError, process, setProcess} = useMarvelService();
 
     // called when component has been fully created and following for changes in charId
     // comparing prev charId and new charId
@@ -33,8 +31,8 @@ const CharInfo = (props) => {
         clearError();
 
         getCharacter(charId) // when we receive a char info it will be sent to method onCharLoaded as an arg. 'char'
-            .then(onCharLoaded) // otherwise - cath the error
-
+            .then(onCharLoaded) 
+            .then(() => setProcess('confirmed'))
     }
 
     // taking arg 'char' from method updateChar if successed 
@@ -42,28 +40,18 @@ const CharInfo = (props) => {
         setChar(char);
     }
 
-
-
-
-    const skeleton = char || loading || error ? null : <Skeleton/>
-    const error_message = error ? <ErrorMessage/> :null;
-    const spinner = loading ? <Spinner/> : null;
-    const content = !(loading || error || !char) ? <View char={char}/> : null;
     
     return (
         <div className="char__info">
-            {skeleton}
-            {error_message}
-            {spinner}
-            {content}
+            {setContent(process, View, char)}
         </div>
     )
 }
     
 
 
-const View = ({char}) => {
-    const {name, description, thumbnail, homepage, wiki, comics} = char;
+const View = ({data}) => {
+    const {name, description, thumbnail, homepage, wiki, comics} = data;
 
     //checking for missed character's photo and fixing error photo from server
     let imgStyle = {'objectFit' : 'cover'};
